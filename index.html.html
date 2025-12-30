@@ -1,0 +1,1365 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>MAV Tracker Cloud</title>
+    
+    <!-- Supabase Client -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        :root {
+            --primary: #667eea;
+            --primary-dark: #5a67d8;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --info: #3b82f6;
+            --bg: #f5f5f5;
+            --card-bg: white;
+            --text: #1a1a1a;
+            --text-light: #666;
+            --border: #e5e5e5;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: var(--text);
+            min-height: 100vh;
+        }
+        
+        /* Configuration Screen */
+        .config-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .config-card {
+            background: white;
+            border-radius: 20px;
+            padding: 40px 30px;
+            width: 100%;
+            max-width: 500px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+        }
+        
+        .config-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .config-logo {
+            font-size: 48px;
+            margin-bottom: 10px;
+        }
+        
+        .config-title {
+            font-size: 28px;
+            font-weight: bold;
+            color: var(--primary);
+            margin-bottom: 5px;
+        }
+        
+        .config-subtitle {
+            color: var(--text-light);
+            font-size: 14px;
+        }
+        
+        /* Info Box */
+        .info-box {
+            background: #f0f9ff;
+            border: 1px solid #bfdbfe;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 20px;
+        }
+        
+        .info-box h3 {
+            color: #1e40af;
+            font-size: 14px;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .info-box p {
+            font-size: 13px;
+            color: #3730a3;
+            line-height: 1.5;
+        }
+        
+        .info-box ol {
+            margin-top: 8px;
+            padding-left: 20px;
+        }
+        
+        .info-box li {
+            font-size: 13px;
+            color: #3730a3;
+            margin-bottom: 4px;
+        }
+        
+        .info-box code {
+            background: white;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+        
+        /* Security Notice */
+        .security-notice {
+            background: #fef3c7;
+            border: 1px solid #fde68a;
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 20px;
+            font-size: 13px;
+        }
+        
+        .security-notice strong {
+            color: #92400e;
+        }
+        
+        /* Login Screen */
+        .login-container {
+            min-height: 100vh;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .login-card {
+            background: white;
+            border-radius: 20px;
+            padding: 40px 30px;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+        }
+        
+        /* Main Container */
+        .container {
+            max-width: 500px;
+            margin: 0 auto;
+            background: white;
+            min-height: 100vh;
+            position: relative;
+            padding-bottom: 70px;
+            display: none;
+        }
+        
+        .container.active {
+            display: block;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: relative;
+        }
+        
+        .header h1 {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 4px;
+        }
+        
+        .header p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        
+        .config-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(255,255,255,0.2);
+            border: 1px solid rgba(255,255,255,0.3);
+            border-radius: 4px;
+            padding: 4px 8px;
+            color: white;
+            cursor: pointer;
+            font-size: 11px;
+        }
+        
+        .config-btn:hover {
+            background: rgba(255,255,255,0.3);
+        }
+        
+        .content {
+            padding: 20px;
+            display: none;
+        }
+        
+        .content.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* Stats */
+        .stat-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+        
+        .stat-card {
+            background: white;
+            border-radius: 12px;
+            padding: 16px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            border: 1px solid var(--border);
+        }
+        
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 16px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            border: 1px solid var(--border);
+        }
+        
+        /* Buttons */
+        .btn {
+            padding: 12px 20px;
+            border-radius: 8px;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 14px;
+            display: inline-block;
+            text-align: center;
+        }
+        
+        .btn:active {
+            transform: scale(0.98);
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+        }
+        
+        .btn-success {
+            background: linear-gradient(135deg, var(--success) 0%, #059669 100%);
+            color: white;
+        }
+        
+        .btn-secondary {
+            background: #e5e5e5;
+            color: #333;
+        }
+        
+        .btn-danger {
+            background: var(--danger);
+            color: white;
+        }
+        
+        .btn-full {
+            width: 100%;
+        }
+        
+        /* Forms */
+        .form-group {
+            margin-bottom: 16px;
+        }
+        
+        .form-label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 6px;
+            color: var(--text);
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        .form-error {
+            color: var(--danger);
+            font-size: 12px;
+            margin-top: 4px;
+        }
+        
+        /* Tab Bar */
+        .tab-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: space-around;
+            padding: 8px 0;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
+        }
+        
+        .tab-btn {
+            flex: 1;
+            padding: 8px;
+            background: none;
+            border: none;
+            color: #999;
+            font-size: 11px;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            transition: color 0.2s;
+        }
+        
+        .tab-btn.active {
+            color: var(--primary);
+        }
+        
+        .tab-icon {
+            width: 24px;
+            height: 24px;
+        }
+        
+        /* Toast */
+        .toast {
+            position: fixed;
+            bottom: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0,0,0,0.8);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-size: 14px;
+            z-index: 1000;
+            display: none;
+        }
+        
+        .toast.show {
+            display: block;
+            animation: slideUp 0.3s ease;
+        }
+        
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateX(-50%) translateY(20px); }
+            to { opacity: 1; transform: translateX(-50%) translateY(0); }
+        }
+        
+        /* Exercise Block */
+        .exercise-block {
+            background: #fafafa;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 16px;
+            border: 1px solid var(--border);
+        }
+        
+        .set-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            background: white;
+            border-radius: 8px;
+            margin-bottom: 8px;
+        }
+        
+        .set-type {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        
+        .set-type.warmup {
+            background: #e5e7eb;
+            color: #6b7280;
+        }
+        
+        .set-type.ramp {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+        
+        .set-type.mav {
+            background: #fef3c7;
+            color: #92400e;
+            border: 1px solid #f59e0b;
+        }
+        
+        .set-type.backoff {
+            background: #d1fae5;
+            color: #065f46;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: var(--text-light);
+        }
+    </style>
+</head>
+<body>
+    <!-- Configuration Screen -->
+    <div id="configScreen" class="config-container">
+        <div class="config-card">
+            <div class="config-header">
+                <div class="config-logo">⚙️</div>
+                <h1 class="config-title">Configurazione Supabase</h1>
+                <p class="config-subtitle">Connetti il tuo database cloud</p>
+            </div>
+            
+            <div class="info-box">
+                <h3>ℹ️ Come ottenere le credenziali:</h3>
+                <ol>
+                    <li>Vai su <strong>supabase.com</strong> e crea un account gratuito</li>
+                    <li>Crea un nuovo progetto (nome: "mav-tracker")</li>
+                    <li>Vai in <strong>Settings → API</strong></li>
+                    <li>Copia <strong>Project URL</strong> e <strong>anon public key</strong></li>
+                    <li>Esegui le query SQL (vedi sotto)</li>
+                </ol>
+            </div>
+            
+            <div class="security-notice">
+                <strong>🔒 Nota sulla sicurezza:</strong> La chiave "anon" è progettata per essere pubblica. 
+                La sicurezza è garantita dalle Row Level Security policies nel database. 
+                I dati vengono salvati solo nel tuo browser (localStorage).
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Supabase Project URL</label>
+                <input type="text" id="configUrl" class="form-input" 
+                       placeholder="https://xxxxx.supabase.co">
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Supabase Anon Key</label>
+                <input type="text" id="configKey" class="form-input" 
+                       placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...">
+            </div>
+            
+            <button class="btn btn-primary btn-full" onclick="saveConfiguration()">
+                Salva Configurazione
+            </button>
+            
+            <div style="margin-top: 20px;">
+                <details>
+                    <summary style="cursor: pointer; color: var(--primary); font-size: 14px; font-weight: 600;">
+                        📋 Query SQL da eseguire
+                    </summary>
+                    <div style="background: #f5f5f5; border-radius: 8px; padding: 12px; margin-top: 12px; font-size: 11px; font-family: monospace; overflow-x: auto;">
+                        <pre style="margin: 0;">-- 1. Tabelle
+CREATE TABLE exercises (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(100) UNIQUE NOT NULL
+);
+
+CREATE TABLE workouts (
+    id SERIAL PRIMARY KEY,
+    user_id UUID REFERENCES auth.users(id),
+    date DATE NOT NULL,
+    notes TEXT
+);
+
+CREATE TABLE workout_exercises (
+    id SERIAL PRIMARY KEY,
+    workout_id INTEGER REFERENCES workouts(id) ON DELETE CASCADE,
+    exercise_id INTEGER REFERENCES exercises(id)
+);
+
+CREATE TABLE workout_sets (
+    id SERIAL PRIMARY KEY,
+    workout_exercise_id INTEGER REFERENCES workout_exercises(id) ON DELETE CASCADE,
+    weight DECIMAL(6,2),
+    reps INTEGER,
+    type VARCHAR(20)
+);
+
+-- 2. RLS
+ALTER TABLE workouts ENABLE ROW LEVEL SECURITY;
+ALTER TABLE workout_exercises ENABLE ROW LEVEL SECURITY;
+ALTER TABLE workout_sets ENABLE ROW LEVEL SECURITY;
+
+-- 3. Policies
+CREATE POLICY "Users can manage own workouts" ON workouts
+    FOR ALL USING (auth.uid() = user_id);
+
+CREATE POLICY "Users can manage own workout exercises" ON workout_exercises
+    FOR ALL USING (workout_id IN (
+        SELECT id FROM workouts WHERE user_id = auth.uid()
+    ));
+
+CREATE POLICY "Users can manage own workout sets" ON workout_sets
+    FOR ALL USING (workout_exercise_id IN (
+        SELECT we.id FROM workout_exercises we
+        JOIN workouts w ON we.workout_id = w.id
+        WHERE w.user_id = auth.uid()
+    ));</pre>
+                    </div>
+                </details>
+            </div>
+        </div>
+    </div>
+
+    <!-- Login Screen -->
+    <div id="loginScreen" class="login-container">
+        <div class="login-card">
+            <div class="config-header">
+                <div class="config-logo">💪</div>
+                <h1 class="config-title">MAV Tracker</h1>
+                <p class="config-subtitle">Accedi al tuo account</p>
+            </div>
+            
+            <div id="loginForm">
+                <div class="form-group">
+                    <label class="form-label">Email</label>
+                    <input type="email" id="loginEmail" class="form-input" placeholder="tua@email.com">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Password</label>
+                    <input type="password" id="loginPassword" class="form-input" placeholder="••••••••">
+                </div>
+                
+                <div id="loginError" class="form-error" style="display: none; margin-bottom: 12px;"></div>
+                
+                <button class="btn btn-primary btn-full" onclick="login()">Accedi</button>
+                
+                <div style="text-align: center; margin: 20px 0;">
+                    <span style="color: var(--text-light); font-size: 14px;">Non hai un account?</span>
+                </div>
+                
+                <button class="btn btn-secondary btn-full" onclick="showRegister()">Registrati</button>
+            </div>
+            
+            <div id="registerForm" style="display: none;">
+                <div class="form-group">
+                    <label class="form-label">Email</label>
+                    <input type="email" id="registerEmail" class="form-input" placeholder="tua@email.com">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Password</label>
+                    <input type="password" id="registerPassword" class="form-input" placeholder="Minimo 6 caratteri">
+                </div>
+                
+                <div id="registerError" class="form-error" style="display: none; margin-bottom: 12px;"></div>
+                
+                <button class="btn btn-success btn-full" onclick="register()">Crea Account</button>
+                
+                <div style="text-align: center; margin: 20px 0;">
+                    <span style="color: var(--text-light); font-size: 14px;">Hai già un account?</span>
+                </div>
+                
+                <button class="btn btn-secondary btn-full" onclick="showLogin()">Torna al Login</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main App -->
+    <div id="appContainer" class="container">
+        <!-- Dashboard -->
+        <div id="dashboard" class="content active">
+            <div class="header">
+                <h1>MAV Tracker</h1>
+                <p id="userEmail">-</p>
+                <button class="config-btn" onclick="showSettings()">⚙️</button>
+            </div>
+            
+            <div style="padding: 20px;">
+                <div class="stat-grid">
+                    <div class="stat-card">
+                        <div style="font-size: 11px; color: var(--text-light); text-transform: uppercase;">Allenamenti</div>
+                        <div style="font-size: 28px; font-weight: bold; color: var(--primary);" id="totalWorkouts">0</div>
+                    </div>
+                    <div class="stat-card">
+                        <div style="font-size: 11px; color: var(--text-light); text-transform: uppercase;">Tonnellaggio</div>
+                        <div style="font-size: 28px; font-weight: bold; color: var(--success);" id="totalTonnage">0</div>
+                    </div>
+                    <div class="stat-card">
+                        <div style="font-size: 11px; color: var(--text-light); text-transform: uppercase;">Settimana</div>
+                        <div style="font-size: 28px; font-weight: bold; color: var(--warning);" id="weekWorkouts">0</div>
+                    </div>
+                    <div class="stat-card">
+                        <div style="font-size: 11px; color: var(--text-light); text-transform: uppercase;">Record MAV</div>
+                        <div style="font-size: 28px; font-weight: bold; color: var(--danger);" id="maxMAV">0</div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3 style="margin-bottom: 12px;">📊 Ultimi Allenamenti</h3>
+                    <div id="recentWorkouts">
+                        <div class="loading">Caricamento...</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Workout -->
+        <div id="workout" class="content">
+            <div class="header">
+                <h1>Nuovo Allenamento</h1>
+                <p>Registra la tua sessione MAV</p>
+            </div>
+            
+            <div style="padding: 20px;">
+                <div class="form-group">
+                    <label class="form-label">Data</label>
+                    <input type="date" id="workoutDate" class="form-input">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Note</label>
+                    <textarea id="workoutNotes" class="form-input" rows="2" placeholder="Come ti sentivi?"></textarea>
+                </div>
+
+                <h3 style="margin-bottom: 12px;">Esercizi</h3>
+                <div id="exercisesList"></div>
+
+                <div class="card">
+                    <select id="exerciseName" class="form-input" style="margin-bottom: 8px;">
+                        <option value="">-- Seleziona Esercizio --</option>
+                        <option value="Squat">Squat</option>
+                        <option value="Stacco">Stacco</option>
+                        <option value="Panca Piana">Panca Piana</option>
+                        <option value="Military Press">Military Press</option>
+                        <option value="Trazioni">Trazioni</option>
+                        <option value="Dip">Dip</option>
+                        <option value="Rematore">Rematore</option>
+                        <option value="Leg Press">Leg Press</option>
+                    </select>
+                    <button class="btn btn-primary btn-full" onclick="addExercise()">+ Aggiungi Esercizio</button>
+                </div>
+
+                <button id="saveBtn" class="btn btn-success btn-full" style="margin-top: 20px; display: none;" onclick="saveWorkout()">
+                    💾 Salva Allenamento
+                </button>
+            </div>
+        </div>
+
+        <!-- History -->
+        <div id="history" class="content">
+            <div class="header">
+                <h1>Storico</h1>
+                <p>I tuoi allenamenti</p>
+            </div>
+            
+            <div style="padding: 20px;">
+                <div id="historyList">
+                    <div class="loading">Caricamento...</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stats -->
+        <div id="stats" class="content">
+            <div class="header">
+                <h1>Statistiche</h1>
+                <p>I tuoi progressi</p>
+            </div>
+            
+            <div style="padding: 20px;">
+                <div class="card">
+                    <h3 style="margin-bottom: 12px;">🏆 Record Personali</h3>
+                    <div id="personalRecords"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab Bar -->
+        <div class="tab-bar">
+            <button class="tab-btn active" onclick="switchTab('dashboard', this)">
+                <svg class="tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+                </svg>
+                <span>Dashboard</span>
+            </button>
+            <button class="tab-btn" onclick="switchTab('workout', this)">
+                <svg class="tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"/>
+                    <line x1="12" y1="8" x2="12" y2="16"/>
+                    <line x1="8" y1="12" x2="16" y2="12"/>
+                </svg>
+                <span>Workout</span>
+            </button>
+            <button class="tab-btn" onclick="switchTab('history', this)">
+                <svg class="tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"/>
+                    <polyline points="12 6 12 12 16 14"/>
+                </svg>
+                <span>Storico</span>
+            </button>
+            <button class="tab-btn" onclick="switchTab('stats', this)">
+                <svg class="tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="12" y1="20" x2="12" y2="10"/>
+                    <line x1="18" y1="20" x2="18" y2="4"/>
+                    <line x1="6" y1="20" x2="6" y2="16"/>
+                </svg>
+                <span>Stats</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div id="settingsModal" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 1000;">
+        <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; border-radius: 12px; padding: 20px; width: 90%; max-width: 400px;">
+            <h3 style="margin-bottom: 16px;">⚙️ Impostazioni</h3>
+            
+            <div style="margin-bottom: 16px;">
+                <strong>Account:</strong> <span id="settingsEmail">-</span>
+            </div>
+            
+            <button class="btn btn-secondary btn-full" style="margin-bottom: 8px;" onclick="resetConfiguration()">
+                🔄 Cambia Configurazione Supabase
+            </button>
+            
+            <button class="btn btn-danger btn-full" style="margin-bottom: 8px;" onclick="logout()">
+                🚪 Esci
+            </button>
+            
+            <button class="btn btn-primary btn-full" onclick="closeSettings()">
+                Chiudi
+            </button>
+        </div>
+    </div>
+
+    <!-- Toast -->
+    <div id="toast" class="toast"></div>
+
+    <script>
+        // Configuration Management
+        let supabaseClient = null;
+        let currentUser = null;
+        let workouts = [];
+        let currentExercises = [];
+        
+        // Check configuration on load
+        document.addEventListener('DOMContentLoaded', function() {
+            const savedUrl = localStorage.getItem('supabase_url');
+            const savedKey = localStorage.getItem('supabase_key');
+            
+            if (savedUrl && savedKey) {
+                // Configuration exists, initialize Supabase
+                initializeSupabase(savedUrl, savedKey);
+            } else {
+                // Show configuration screen
+                document.getElementById('configScreen').style.display = 'flex';
+            }
+            
+            // Set today's date
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('workoutDate').value = today;
+        });
+        
+        // Save Configuration
+        function saveConfiguration() {
+            const url = document.getElementById('configUrl').value.trim();
+            const key = document.getElementById('configKey').value.trim();
+            
+            if (!url || !key) {
+                showToast('Inserisci entrambe le credenziali');
+                return;
+            }
+            
+            // Validate URL format
+            if (!url.startsWith('https://') || !url.includes('supabase.co')) {
+                showToast('URL non valido. Deve essere https://xxxxx.supabase.co');
+                return;
+            }
+            
+            // Save to localStorage
+            localStorage.setItem('supabase_url', url);
+            localStorage.setItem('supabase_key', key);
+            
+            showToast('Configurazione salvata!');
+            
+            // Initialize Supabase
+            initializeSupabase(url, key);
+        }
+        
+        // Initialize Supabase
+        async function initializeSupabase(url, key) {
+            try {
+                // Create Supabase client
+                supabaseClient = window.supabase.createClient(url, key);
+                
+                // Check if user is logged in
+                const { data: { session } } = await supabaseClient.auth.getSession();
+                
+                if (session) {
+                    currentUser = session.user;
+                    showApp();
+                    loadData();
+                } else {
+                    showLoginScreen();
+                }
+                
+                // Listen for auth changes
+                supabaseClient.auth.onAuthStateChange((event, session) => {
+                    if (event === 'SIGNED_IN') {
+                        currentUser = session.user;
+                        showApp();
+                        loadData();
+                    } else if (event === 'SIGNED_OUT') {
+                        currentUser = null;
+                        showLoginScreen();
+                    }
+                });
+                
+            } catch (error) {
+                console.error('Error initializing Supabase:', error);
+                showToast('Errore di connessione. Verifica le credenziali.');
+            }
+        }
+        
+        // Reset Configuration
+        function resetConfiguration() {
+            if (confirm('Vuoi davvero cambiare la configurazione? Dovrai effettuare nuovamente il login.')) {
+                localStorage.removeItem('supabase_url');
+                localStorage.removeItem('supabase_key');
+                location.reload();
+            }
+        }
+        
+        // UI Functions
+        function showLoginScreen() {
+            document.getElementById('configScreen').style.display = 'none';
+            document.getElementById('loginScreen').style.display = 'flex';
+            document.getElementById('appContainer').classList.remove('active');
+        }
+        
+        function showApp() {
+            document.getElementById('configScreen').style.display = 'none';
+            document.getElementById('loginScreen').style.display = 'none';
+            document.getElementById('appContainer').classList.add('active');
+            document.getElementById('userEmail').textContent = currentUser.email;
+            document.getElementById('settingsEmail').textContent = currentUser.email;
+        }
+        
+        function showRegister() {
+            document.getElementById('loginForm').style.display = 'none';
+            document.getElementById('registerForm').style.display = 'block';
+        }
+        
+        function showLogin() {
+            document.getElementById('loginForm').style.display = 'block';
+            document.getElementById('registerForm').style.display = 'none';
+        }
+        
+        function showSettings() {
+            document.getElementById('settingsModal').style.display = 'block';
+        }
+        
+        function closeSettings() {
+            document.getElementById('settingsModal').style.display = 'none';
+        }
+        
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 3000);
+        }
+        
+        function showError(elementId, message) {
+            const element = document.getElementById(elementId);
+            element.textContent = message;
+            element.style.display = 'block';
+            setTimeout(() => element.style.display = 'none', 5000);
+        }
+        
+        // Auth Functions
+        async function login() {
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            
+            if (!email || !password) {
+                showError('loginError', 'Inserisci email e password');
+                return;
+            }
+            
+            showToast('Accesso in corso...');
+            
+            const { data, error } = await supabaseClient.auth.signInWithPassword({
+                email: email,
+                password: password
+            });
+            
+            if (error) {
+                showError('loginError', error.message);
+            } else {
+                showToast('Accesso effettuato!');
+            }
+        }
+        
+        async function register() {
+            const email = document.getElementById('registerEmail').value;
+            const password = document.getElementById('registerPassword').value;
+            
+            if (!email || !password) {
+                showError('registerError', 'Compila tutti i campi');
+                return;
+            }
+            
+            if (password.length < 6) {
+                showError('registerError', 'Password minimo 6 caratteri');
+                return;
+            }
+            
+            showToast('Registrazione in corso...');
+            
+            const { data, error } = await supabaseClient.auth.signUp({
+                email: email,
+                password: password
+            });
+            
+            if (error) {
+                showError('registerError', error.message);
+            } else {
+                showToast('Registrazione completata! Controlla la tua email.');
+                showLogin();
+            }
+        }
+        
+        async function logout() {
+            if (confirm('Vuoi davvero uscire?')) {
+                await supabaseClient.auth.signOut();
+                showToast('Disconnesso');
+            }
+        }
+        
+        // Tab Navigation
+        function switchTab(tab, btn) {
+            document.querySelectorAll('.content').forEach(c => c.classList.remove('active'));
+            document.getElementById(tab).classList.add('active');
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            
+            if (tab === 'dashboard') updateDashboard();
+            if (tab === 'history') updateHistory();
+            if (tab === 'stats') updateStats();
+        }
+        
+        // Data Functions
+        async function loadData() {
+            try {
+                const { data: workoutsData, error } = await supabaseClient
+                    .from('workouts')
+                    .select(`
+                        *,
+                        workout_exercises (
+                            *,
+                            exercise:exercises(*),
+                            sets:workout_sets(*)
+                        )
+                    `)
+                    .eq('user_id', currentUser.id)
+                    .order('date', { ascending: false });
+                
+                if (error) throw error;
+                
+                workouts = workoutsData || [];
+                updateDashboard();
+                
+            } catch (error) {
+                console.error('Error loading data:', error);
+                showToast('Errore caricamento dati');
+            }
+        }
+        
+        // Dashboard
+        function updateDashboard() {
+            const totalWorkouts = workouts.length;
+            const totalTonnage = calculateTotalTonnage();
+            const weekWorkouts = getThisWeekWorkouts();
+            const maxMAV = getMaxMAV();
+            
+            document.getElementById('totalWorkouts').textContent = totalWorkouts;
+            document.getElementById('totalTonnage').textContent = (totalTonnage/1000).toFixed(1) + 't';
+            document.getElementById('weekWorkouts').textContent = weekWorkouts.length;
+            document.getElementById('maxMAV').textContent = maxMAV + 'kg';
+            
+            updateRecentWorkouts();
+        }
+        
+        function calculateTotalTonnage() {
+            return workouts.reduce((total, workout) => {
+                const workoutTonnage = (workout.workout_exercises || []).reduce((sum, ex) => {
+                    return sum + (ex.sets || []).reduce((setSum, set) => {
+                        return setSum + (set.weight * set.reps);
+                    }, 0);
+                }, 0);
+                return total + workoutTonnage;
+            }, 0);
+        }
+        
+        function getThisWeekWorkouts() {
+            const weekStart = new Date();
+            weekStart.setDate(weekStart.getDate() - weekStart.getDay());
+            weekStart.setHours(0, 0, 0, 0);
+            
+            return workouts.filter(w => new Date(w.date) >= weekStart);
+        }
+        
+        function getMaxMAV() {
+            let max = 0;
+            workouts.forEach(workout => {
+                (workout.workout_exercises || []).forEach(ex => {
+                    (ex.sets || []).forEach(set => {
+                        if (set.type === 'MAV' && set.weight > max) {
+                            max = set.weight;
+                        }
+                    });
+                });
+            });
+            return max;
+        }
+        
+        function updateRecentWorkouts() {
+            const container = document.getElementById('recentWorkouts');
+            const recent = workouts.slice(0, 3);
+            
+            if (recent.length === 0) {
+                container.innerHTML = '<div class="loading">Nessun allenamento registrato</div>';
+                return;
+            }
+            
+            container.innerHTML = recent.map(workout => {
+                const exercises = (workout.workout_exercises || []).map(we => we.exercise?.name || 'Esercizio').join(', ');
+                const tonnage = (workout.workout_exercises || []).reduce((sum, ex) => {
+                    return sum + (ex.sets || []).reduce((setSum, set) => {
+                        return setSum + (set.weight * set.reps);
+                    }, 0);
+                }, 0);
+                
+                return `
+                    <div style="padding: 12px; background: #f5f5f5; border-radius: 8px; margin-bottom: 8px;">
+                        <div style="display: flex; justify-content: space-between;">
+                            <div>
+                                <strong>${new Date(workout.date).toLocaleDateString('it-IT')}</strong>
+                                <div style="font-size: 12px; color: #666; margin-top: 4px;">${exercises}</div>
+                            </div>
+                            <div style="text-align: center;">
+                                <div style="font-size: 18px; font-weight: bold; color: var(--primary);">${Math.round(tonnage)}</div>
+                                <div style="font-size: 10px; color: #666;">KG</div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        // Workout Functions
+        function addExercise() {
+            const select = document.getElementById('exerciseName');
+            const name = select.value;
+            
+            if (!name) {
+                showToast('Seleziona un esercizio');
+                return;
+            }
+            
+            currentExercises.push({
+                id: Date.now(),
+                name: name,
+                sets: []
+            });
+            
+            select.value = '';
+            updateExercisesList();
+            document.getElementById('saveBtn').style.display = 'block';
+        }
+        
+        function updateExercisesList() {
+            const container = document.getElementById('exercisesList');
+            
+            container.innerHTML = currentExercises.map(ex => {
+                const tonnage = ex.sets.reduce((sum, s) => sum + (s.weight * s.reps), 0);
+                
+                return `
+                    <div class="exercise-block">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 12px;">
+                            <strong>${ex.name}</strong>
+                            <span style="font-size: 12px; color: var(--primary);">${tonnage} kg</span>
+                        </div>
+                        
+                        <button class="btn btn-primary btn-full" style="margin-bottom: 8px;" onclick="addMAVSequence(${ex.id})">
+                            ⚡ Sequenza MAV
+                        </button>
+                        
+                        <div>
+                            ${ex.sets.map(set => `
+                                <div class="set-row">
+                                    <div>
+                                        <span class="set-type ${set.type.toLowerCase()}">${set.type.substr(0, 1)}</span>
+                                        <strong>${set.weight} kg × ${set.reps}</strong>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                        
+                        <div style="display: flex; gap: 8px; margin-top: 8px;">
+                            <input type="number" id="weight-${ex.id}" placeholder="Kg" value="100" style="flex: 1; padding: 8px; border: 1px solid #e5e5e5; border-radius: 6px;">
+                            <input type="number" id="reps-${ex.id}" placeholder="Reps" value="1" style="width: 60px; padding: 8px; border: 1px solid #e5e5e5; border-radius: 6px;">
+                            <select id="type-${ex.id}" style="padding: 8px; border: 1px solid #e5e5e5; border-radius: 6px;">
+                                <option value="WARMUP">W</option>
+                                <option value="RAMP">R</option>
+                                <option value="MAV" selected>MAV</option>
+                                <option value="BACKOFF">B</option>
+                            </select>
+                            <button class="btn btn-primary" onclick="addSet(${ex.id})">+</button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        function addSet(exerciseId) {
+            const exercise = currentExercises.find(e => e.id === exerciseId);
+            if (!exercise) return;
+            
+            const weight = parseFloat(document.getElementById('weight-' + exerciseId).value);
+            const reps = parseInt(document.getElementById('reps-' + exerciseId).value);
+            const type = document.getElementById('type-' + exerciseId).value;
+            
+            exercise.sets.push({
+                weight: weight,
+                reps: reps,
+                type: type
+            });
+            
+            updateExercisesList();
+        }
+        
+        function addMAVSequence(exerciseId) {
+            const target = parseFloat(prompt('Peso target MAV (kg)?', '100'));
+            if (!target) return;
+            
+            const exercise = currentExercises.find(e => e.id === exerciseId);
+            if (!exercise) return;
+            
+            exercise.sets = [
+                { weight: Math.round(target * 0.58), reps: 4, type: 'WARMUP' },
+                { weight: Math.round(target * 0.67), reps: 2, type: 'WARMUP' },
+                { weight: Math.round(target * 0.75), reps: 1, type: 'RAMP' },
+                { weight: Math.round(target * 0.83), reps: 1, type: 'RAMP' },
+                { weight: Math.round(target * 0.92), reps: 1, type: 'RAMP' },
+                { weight: target, reps: 1, type: 'MAV' },
+                { weight: Math.round(target * 0.92), reps: 2, type: 'BACKOFF' }
+            ];
+            
+            updateExercisesList();
+        }
+        
+        async function saveWorkout() {
+            if (currentExercises.length === 0) {
+                showToast('Aggiungi almeno un esercizio');
+                return;
+            }
+            
+            showToast('Salvataggio...');
+            
+            try {
+                // Create workout
+                const { data: workout, error: workoutError } = await supabaseClient
+                    .from('workouts')
+                    .insert({
+                        user_id: currentUser.id,
+                        date: document.getElementById('workoutDate').value,
+                        notes: document.getElementById('workoutNotes').value
+                    })
+                    .select()
+                    .single();
+                
+                if (workoutError) throw workoutError;
+                
+                // Add exercises and sets
+                for (const exercise of currentExercises) {
+                    // Get or create exercise
+                    let exerciseId;
+                    const { data: existingExercise } = await supabaseClient
+                        .from('exercises')
+                        .select('id')
+                        .eq('name', exercise.name)
+                        .single();
+                    
+                    if (existingExercise) {
+                        exerciseId = existingExercise.id;
+                    } else {
+                        const { data: newExercise, error } = await supabaseClient
+                            .from('exercises')
+                            .insert({ name: exercise.name })
+                            .select()
+                            .single();
+                        
+                        if (error) throw error;
+                        exerciseId = newExercise.id;
+                    }
+                    
+                    // Create workout_exercise
+                    const { data: workoutExercise, error: weError } = await supabaseClient
+                        .from('workout_exercises')
+                        .insert({
+                            workout_id: workout.id,
+                            exercise_id: exerciseId
+                        })
+                        .select()
+                        .single();
+                    
+                    if (weError) throw weError;
+                    
+                    // Add sets
+                    const sets = exercise.sets.map(set => ({
+                        workout_exercise_id: workoutExercise.id,
+                        weight: set.weight,
+                        reps: set.reps,
+                        type: set.type
+                    }));
+                    
+                    const { error: setsError } = await supabaseClient
+                        .from('workout_sets')
+                        .insert(sets);
+                    
+                    if (setsError) throw setsError;
+                }
+                
+                // Reset form
+                currentExercises = [];
+                document.getElementById('workoutNotes').value = '';
+                document.getElementById('workoutDate').value = new Date().toISOString().split('T')[0];
+                updateExercisesList();
+                document.getElementById('saveBtn').style.display = 'none';
+                
+                // Reload data
+                await loadData();
+                showToast('Allenamento salvato!');
+                
+                // Switch to dashboard
+                switchTab('dashboard', document.querySelector('.tab-btn'));
+                
+            } catch (error) {
+                console.error('Error saving workout:', error);
+                showToast('Errore nel salvataggio');
+            }
+        }
+        
+        // History
+        function updateHistory() {
+            const container = document.getElementById('historyList');
+            
+            if (workouts.length === 0) {
+                container.innerHTML = '<div class="loading">Nessun allenamento registrato</div>';
+                return;
+            }
+            
+            container.innerHTML = workouts.map(workout => {
+                const exercises = (workout.workout_exercises || []).map(we => we.exercise?.name || 'Esercizio').join(', ');
+                const tonnage = (workout.workout_exercises || []).reduce((sum, ex) => {
+                    return sum + (ex.sets || []).reduce((setSum, set) => {
+                        return setSum + (set.weight * set.reps);
+                    }, 0);
+                }, 0);
+                
+                return `
+                    <div class="card">
+                        <div style="display: flex; justify-content: space-between;">
+                            <div>
+                                <strong>${new Date(workout.date).toLocaleDateString('it-IT', {
+                                    weekday: 'long',
+                                    day: 'numeric',
+                                    month: 'long'
+                                })}</strong>
+                                <div style="font-size: 12px; color: #666; margin-top: 4px;">
+                                    ${exercises}
+                                </div>
+                                ${workout.notes ? `<div style="font-size: 12px; font-style: italic; margin-top: 4px;">"${workout.notes}"</div>` : ''}
+                            </div>
+                            <div style="text-align: center;">
+                                <div style="font-size: 24px; font-weight: bold; color: var(--primary);">
+                                    ${Math.round(tonnage)}
+                                </div>
+                                <div style="font-size: 10px; color: #666;">KG</div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        // Stats
+        function updateStats() {
+            updatePersonalRecords();
+        }
+        
+        function updatePersonalRecords() {
+            const container = document.getElementById('personalRecords');
+            const records = {};
+            
+            workouts.forEach(workout => {
+                (workout.workout_exercises || []).forEach(ex => {
+                    const exerciseName = ex.exercise?.name || 'Esercizio';
+                    const mavSets = (ex.sets || []).filter(s => s.type === 'MAV');
+                    
+                    if (mavSets.length > 0) {
+                        const max = Math.max(...mavSets.map(s => s.weight));
+                        if (!records[exerciseName] || max > records[exerciseName]) {
+                            records[exerciseName] = max;
+                        }
+                    }
+                });
+            });
+            
+            if (Object.keys(records).length === 0) {
+                container.innerHTML = '<div class="loading">Nessun record registrato</div>';
+                return;
+            }
+            
+            container.innerHTML = Object.entries(records)
+                .sort((a, b) => b[1] - a[1])
+                .map(([exercise, weight]) => `
+                    <div style="display: flex; justify-content: space-between; padding: 8px; background: #f5f5f5; border-radius: 6px; margin-bottom: 4px;">
+                        <span>${exercise}</span>
+                        <strong style="color: var(--primary);">${weight} kg</strong>
+                    </div>
+                `).join('');
+        }
+    </script>
+</body>
+</html>
