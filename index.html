@@ -617,9 +617,14 @@ CREATE POLICY "Users own sets" ON workout_sets
             
             <div style="padding: 20px;">
                 <label class="form-label">Andamento Carichi (Max/MAV)</label>
-                <select id="chartExerciseSelector" class="form-input" onchange="updateChart()" style="margin-bottom: 15px;">
-                    <option>Seleziona un esercizio</option>
-                </select>
+                <select id="chartExerciseSelector"
+        class="form-input"
+        onchange="updateChart()"
+        disabled
+        style="margin-bottom: 15px;">
+    <option>Caricamento esercizi...</option>
+</select>
+
                 
                 <div class="card">
                     <canvas id="progressChart"></canvas>
@@ -833,6 +838,7 @@ CREATE POLICY "Users own sets" ON workout_sets
                 workouts = data || [];
                 updateDashboard();
                 loadExerciseList(); // Popola il menu a tendina
+                initChartSelector();
                 
             } catch (e) {
                 console.error(e);
@@ -1156,24 +1162,33 @@ CREATE POLICY "Users own sets" ON workout_sets
 
         // --- GRAFICI (CHART.JS) ---
         function initChartSelector() {
-            const sel = document.getElementById('chartExerciseSelector');
-            const unique = new Set();
-            
-            // Trova tutti gli esercizi usati nello storico
-            workouts.forEach(w => {
-                w.workout_exercises.forEach(we => {
-                    if (we.exercise?.name) unique.add(we.exercise.name);
-                });
-            });
-            
-            sel.innerHTML = '<option value="">Seleziona esercizio per il grafico...</option>';
-            unique.forEach(name => {
-                const opt = document.createElement('option');
-                opt.value = name;
-                opt.textContent = name;
-                sel.appendChild(opt);
-            });
-        }
+    const sel = document.getElementById('chartExerciseSelector');
+    const unique = new Set();
+
+    workouts.forEach(w => {
+        (w.workout_exercises || []).forEach(we => {
+            if (we.exercise?.name) unique.add(we.exercise.name);
+        });
+    });
+
+    // Nessun esercizio → Safari iOS nasconde il select
+    if (unique.size === 0) {
+        sel.innerHTML = '<option>Nessun esercizio disponibile</option>';
+        sel.disabled = true;
+        return;
+    }
+
+    sel.disabled = false;
+    sel.innerHTML = '<option value="">Seleziona esercizio...</option>';
+
+    unique.forEach(name => {
+        const opt = document.createElement('option');
+        opt.value = name;
+        opt.textContent = name;
+        sel.appendChild(opt);
+    });
+}
+
 
         function updateChart() {
             const exName = document.getElementById('chartExerciseSelector').value;
