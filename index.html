@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>MAV Tracker v2.2 (Pro)</title>
+    <title>MAV Tracker Cloud v2.1</title>
     
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -33,136 +33,194 @@
             min-height: 100vh;
         }
         
-        /* --- LAYOUT GENERICO --- */
+        /* --- LAYOUT CONFIGURAZIONE --- */
         .config-container, .login-container {
-            min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
         }
+        
         .config-card, .login-card {
-            background: white; border-radius: 20px; padding: 40px 30px; width: 100%; max-width: 500px;
+            background: white;
+            border-radius: 20px;
+            padding: 40px 30px;
+            width: 100%;
+            max-width: 500px;
             box-shadow: 0 20px 60px rgba(0,0,0,0.2);
         }
+
         .config-header { text-align: center; margin-bottom: 30px; }
         .config-logo { font-size: 48px; margin-bottom: 10px; }
+        .config-title { font-size: 28px; font-weight: bold; color: var(--primary); }
+        .config-subtitle { color: var(--text-light); font-size: 14px; }
         
+        /* --- LAYOUT PRINCIPALE --- */
         .container {
-            max-width: 500px; margin: 0 auto; background: white; min-height: 100vh;
-            position: relative; padding-bottom: 80px; display: none;
+            max-width: 500px;
+            margin: 0 auto;
+            background: white;
+            min-height: 100vh;
+            position: relative;
+            padding-bottom: 80px;
+            display: none;
         }
+        
         .container.active { display: block; }
         
         .header {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white; padding: 20px; position: relative;
+            color: white;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: relative;
         }
-        .header h1 { font-size: 24px; font-weight: bold; }
+        
+        .header h1 { font-size: 24px; font-weight: bold; margin-bottom: 4px; }
+        .header p { font-size: 14px; opacity: 0.9; }
+        
         .config-btn {
-            position: absolute; top: 20px; right: 20px;
-            background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.3);
-            border-radius: 4px; padding: 4px 8px; color: white; cursor: pointer;
+            position: absolute;
+            top: 20px; right: 20px;
+            background: rgba(255,255,255,0.2);
+            border: 1px solid rgba(255,255,255,0.3);
+            border-radius: 4px; padding: 4px 8px;
+            color: white; cursor: pointer; font-size: 11px;
         }
         
         .content { padding: 20px; display: none; }
         .content.active { display: block; animation: fadeIn 0.3s ease; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         
-        /* --- COMPONENTI UI --- */
-        .card, .stat-card {
-            background: white; border-radius: 12px; padding: 16px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05); border: 1px solid var(--border); margin-bottom: 16px;
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
+        
+        /* --- UI COMPONENTS --- */
         .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; }
         
+        .card, .stat-card {
+            background: white;
+            border-radius: 12px;
+            padding: 16px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            border: 1px solid var(--border);
+            margin-bottom: 16px;
+        }
+        
+        /* Bottoni */
         .btn {
-            padding: 12px 20px; border-radius: 8px; border: none; font-weight: 600; cursor: pointer;
-            width: 100%; display: block; text-align: center; transition: 0.2s;
+            padding: 12px 20px;
+            border-radius: 8px; border: none;
+            font-weight: 600; cursor: pointer;
+            transition: all 0.2s; font-size: 14px;
+            display: inline-block; text-align: center;
         }
         .btn:active { transform: scale(0.98); }
         .btn-primary { background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%); color: white; }
-        .btn-success { background: var(--success); color: white; }
+        .btn-success { background: linear-gradient(135deg, var(--success) 0%, #059669 100%); color: white; }
         .btn-warning { background: var(--warning); color: white; }
-        .btn-danger { background: var(--danger); color: white; }
         .btn-secondary { background: #e5e5e5; color: #333; }
-        .btn-sm { padding: 4px 8px; font-size: 12px; width: auto; display: inline-block; }
-
-        .form-group { margin-bottom: 16px; }
-        .form-input {
-            width: 100%; padding: 10px 12px; border: 1px solid var(--border); border-radius: 8px; font-size: 14px;
-        }
+        .btn-danger { background: var(--danger); color: white; }
+        .btn-full { width: 100%; }
         
-        /* Esercizi */
+        /* Form */
+        .form-group { margin-bottom: 16px; }
+        .form-label { display: block; font-size: 14px; font-weight: 600; margin-bottom: 6px; }
+        .form-input {
+            width: 100%; padding: 10px 12px;
+            border: 1px solid var(--border);
+            border-radius: 8px; font-size: 14px;
+        }
+        .form-input:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(102,126,234,0.1); }
+        .form-error { color: var(--danger); font-size: 12px; margin-top: 4px; }
+        
+        /* Tab Bar */
+        .tab-bar {
+            position: fixed; bottom: 0; left: 0; right: 0;
+            background: white; border-top: 1px solid var(--border);
+            display: flex; justify-content: space-around;
+            padding: 8px 0; z-index: 100;
+        }
+        .tab-btn {
+            flex: 1; padding: 8px; background: none; border: none;
+            color: #999; font-size: 11px; cursor: pointer;
+            display: flex; flex-direction: column; align-items: center; gap: 4px;
+        }
+        .tab-btn.active { color: var(--primary); }
+        .tab-icon { width: 24px; height: 24px; }
+        
+        /* Esercizi e Set */
         .exercise-block {
-            background: #fafafa; border-radius: 12px; padding: 12px;
+            background: #fafafa;
+            border-radius: 12px; padding: 16px;
             margin-bottom: 16px; border: 1px solid var(--border);
         }
         .set-row {
             display: flex; justify-content: space-between; align-items: center;
-            padding: 8px; background: white; border-radius: 6px; margin-bottom: 6px; border: 1px solid #eee;
+            padding: 10px; background: white;
+            border-radius: 8px; margin-bottom: 8px;
         }
-        .set-info { display: flex; align-items: center; gap: 8px; font-size: 14px; }
-        .rpe-tag {
-            background: #4b5563; color: white; padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: bold;
+        .set-type {
+            padding: 4px 8px; border-radius: 4px;
+            font-size: 11px; font-weight: bold; text-transform: uppercase; margin-right: 8px;
+        }
+        .set-type.warmup { background: #e5e7eb; color: #6b7280; }
+        .set-type.ramp { background: #dbeafe; color: #1e40af; }
+        .set-type.mav { background: #fef3c7; color: #92400e; border: 1px solid #f59e0b; }
+        .set-type.backoff { background: #d1fae5; color: #065f46; }
+
+        /* Banner Modifica */
+        .edit-banner {
+            background: var(--warning); color: white;
+            padding: 10px; text-align: center;
+            font-size: 13px; font-weight: bold;
+            display: none; border-radius: 8px; margin-bottom: 15px;
         }
         
-        /* Input Grid per i Set */
-        .set-input-grid {
-            display: grid; grid-template-columns: 1fr 40px 40px 50px 50px; gap: 6px; align-items: center; margin-top: 10px;
-        }
-        
-        /* Tab Bar */
-        .tab-bar {
-            position: fixed; bottom: 0; left: 0; right: 0; background: white; border-top: 1px solid var(--border);
-            display: flex; justify-content: space-around; padding: 8px 0; z-index: 100;
-        }
-        .tab-btn {
-            background: none; border: none; color: #999; font-size: 11px; cursor: pointer;
-            display: flex; flex-direction: column; align-items: center; gap: 4px;
-        }
-        .tab-btn.active { color: var(--primary); }
-        
-        /* Modals & Toasts */
-        .modal-overlay {
-            position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.6);
-            z-index: 2000; display: none; align-items: center; justify-content: center;
-        }
-        .modal-content {
-            background: white; width: 90%; max-width: 350px; padding: 20px; border-radius: 16px; position: relative;
-        }
+        /* Toast & Timer */
         .toast {
             position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%);
-            background: rgba(0,0,0,0.8); color: white; padding: 12px 20px; border-radius: 8px;
-            display: none; z-index: 3000;
+            background: rgba(0,0,0,0.8); color: white;
+            padding: 12px 20px; border-radius: 8px; font-size: 14px;
+            z-index: 1000; display: none;
         }
         .toast.show { display: block; animation: slideUp 0.3s ease; }
         
-        /* Plate Calc Visuals */
-        .plate-stack { display: flex; align-items: center; justify-content: center; gap: 2px; margin: 20px 0; }
-        .plate { height: 60px; border-radius: 4px; border: 1px solid #333; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 10px; writing-mode: vertical-rl; }
-        .p-25 { background: #ef4444; width: 18px; }
-        .p-20 { background: #3b82f6; width: 18px; }
-        .p-15 { background: #eab308; width: 16px; }
-        .p-10 { background: #22c55e; width: 14px; }
-        .p-5 { background: white; border-color: #333; color: #333; width: 12px; }
-        .p-2-5 { background: #333; width: 10px; height: 40px; }
-        .p-1-25 { background: #999; width: 8px; height: 35px; }
-        .bar-end { width: 10px; height: 20px; background: #9ca3af; }
+        .timer-float {
+            position: fixed; bottom: 70px; right: 20px;
+            background: #1a1a1a; color: white;
+            padding: 10px 15px; border-radius: 30px;
+            z-index: 900; display: none; align-items: center; gap: 10px;
+        }
 
-        @keyframes slideUp { from { transform: translateX(-50%) translateY(20px); opacity: 0; } to { transform: translateX(-50%) translateY(0); opacity: 1; } }
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateX(-50%) translateY(20px); }
+            to { opacity: 1; transform: translateX(-50%) translateY(0); }
+        }
+        
+        .loading { text-align: center; padding: 20px; color: #999; }
     </style>
 </head>
 <body>
-
     <div id="configScreen" class="config-container">
         <div class="config-card">
             <div class="config-header">
                 <div class="config-logo">⚙️</div>
-                <h1>Setup</h1>
+                <h1 class="config-title">Configurazione</h1>
+                <p class="config-subtitle">Database Supabase</p>
             </div>
-            <p style="font-size:12px; color:red; margin-bottom:10px; background:#fee2e2; padding:10px; border-radius:8px;">
-                ⚠️ Esegui "ALTER TABLE workout_sets ADD COLUMN rpe DECIMAL(3,1);" su Supabase prima di iniziare!
-            </p>
-            <div class="form-group"><input type="text" id="configUrl" class="form-input" placeholder="Supabase URL"></div>
-            <div class="form-group"><input type="text" id="configKey" class="form-input" placeholder="Supabase Anon Key"></div>
-            <button class="btn btn-primary" onclick="saveConfiguration()">Salva</button>
+            
+            <div class="form-group">
+                <label class="form-label">Supabase URL</label>
+                <input type="text" id="configUrl" class="form-input" placeholder="https://xxxxx.supabase.co">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Supabase Anon Key</label>
+                <input type="text" id="configKey" class="form-input" placeholder="Key...">
+            </div>
+            <button class="btn btn-primary btn-full" onclick="saveConfiguration()">Salva</button>
         </div>
     </div>
 
@@ -170,19 +228,22 @@
         <div class="login-card">
             <div class="config-header">
                 <div class="config-logo">💪</div>
-                <h1>MAV Tracker Pro</h1>
+                <h1 class="config-title">MAV Tracker</h1>
+                <p class="config-subtitle">Login</p>
             </div>
             <div id="loginForm">
-                <div class="form-group"><input type="email" id="loginEmail" class="form-input" placeholder="Email"></div>
-                <div class="form-group"><input type="password" id="loginPassword" class="form-input" placeholder="Password"></div>
-                <button class="btn btn-primary" onclick="login()">Accedi</button>
-                <button class="btn btn-secondary" style="margin-top:10px" onclick="showRegister()">Registrati</button>
+                <input type="email" id="loginEmail" class="form-input" placeholder="Email" style="margin-bottom:10px;">
+                <input type="password" id="loginPassword" class="form-input" placeholder="Password" style="margin-bottom:10px;">
+                <div id="loginError" class="form-error" style="display: none; margin-bottom: 12px;"></div>
+                <button class="btn btn-primary btn-full" onclick="login()">Accedi</button>
+                <button class="btn btn-secondary btn-full" onclick="showRegister()" style="margin-top:10px">Registrati</button>
             </div>
             <div id="registerForm" style="display: none;">
-                <div class="form-group"><input type="email" id="registerEmail" class="form-input" placeholder="Email"></div>
-                <div class="form-group"><input type="password" id="registerPassword" class="form-input" placeholder="Password (min 6)"></div>
-                <button class="btn btn-success" onclick="register()">Crea Account</button>
-                <button class="btn btn-secondary" style="margin-top:10px" onclick="showLogin()">Indietro</button>
+                <input type="email" id="registerEmail" class="form-input" placeholder="Email" style="margin-bottom:10px;">
+                <input type="password" id="registerPassword" class="form-input" placeholder="Password (min 6 chars)" style="margin-bottom:10px;">
+                <div id="registerError" class="form-error" style="display: none; margin-bottom: 12px;"></div>
+                <button class="btn btn-success btn-full" onclick="register()">Crea Account</button>
+                <button class="btn btn-secondary btn-full" onclick="showLogin()" style="margin-top: 10px;">Indietro</button>
             </div>
         </div>
     </div>
@@ -191,39 +252,50 @@
         
         <div id="dashboard" class="content active">
             <div class="header">
-                <h1>Dashboard</h1>
+                <h1>MAV Tracker</h1>
+                <p id="userEmail">-</p>
                 <button class="config-btn" onclick="showSettings()">⚙️</button>
             </div>
             <div style="padding: 20px;">
                 <div class="stat-grid">
                     <div class="stat-card">
-                        <div style="font-size: 11px; color: #666;">ALLENAMENTI</div>
+                        <div style="font-size: 11px; color: var(--text-light);">ALLENAMENTI</div>
                         <div style="font-size: 28px; font-weight: bold; color: var(--primary);" id="totalWorkouts">0</div>
                     </div>
                     <div class="stat-card">
-                        <div style="font-size: 11px; color: #666;">TONNELLAGGIO</div>
+                        <div style="font-size: 11px; color: var(--text-light);">TONNELLAGGIO</div>
                         <div style="font-size: 28px; font-weight: bold; color: var(--success);" id="totalTonnage">0</div>
                     </div>
                 </div>
                 <div class="card">
-                    <h3>📊 Recenti</h3>
-                    <div id="recentWorkouts" style="margin-top:10px;">Caricamento...</div>
+                    <h3 style="margin-bottom: 12px;">📊 Recenti</h3>
+                    <div id="recentWorkouts"><div class="loading">Caricamento...</div></div>
                 </div>
             </div>
         </div>
 
         <div id="workout" class="content">
             <div class="header" id="workoutHeader">
-                <h1>Workout</h1>
+                <h1>Nuovo Workout</h1>
+                <p>Registra sessione</p>
             </div>
+            
             <div style="padding: 20px;">
-                <div id="editBanner" style="display:none; background:var(--warning); color:white; padding:10px; border-radius:8px; margin-bottom:15px; font-size:13px; font-weight:bold;">
-                    MODALITÀ MODIFICA <button onclick="cancelEdit()" style="margin-left:10px; background:white; border:none; color:var(--warning); border-radius:4px; padding:2px 6px;">Annulla</button>
+                <div id="editModeBanner" class="edit-banner">
+                    ⚠️ MODALITÀ MODIFICA ATTIVA
+                    <button onclick="cancelEdit()" style="margin-left:10px; padding:2px 8px; border-radius:4px; border:none; background:white; color:var(--warning); cursor:pointer;">Annulla</button>
                 </div>
 
-                <input type="date" id="workoutDate" class="form-input" style="margin-bottom:10px;">
-                <textarea id="workoutNotes" class="form-input" rows="2" placeholder="Note allenamento..." style="margin-bottom:10px;"></textarea>
+                <div class="form-group">
+                    <label class="form-label">Data</label>
+                    <input type="date" id="workoutDate" class="form-input">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Note</label>
+                    <textarea id="workoutNotes" class="form-input" rows="2" placeholder="Sensazioni..."></textarea>
+                </div>
 
+                <h3 style="margin-bottom: 12px;">Esercizi</h3>
                 <div id="exercisesList"></div>
 
                 <div class="card" style="margin-top:20px;">
@@ -234,134 +306,161 @@
                     <div style="text-align:right; margin-bottom:8px;">
                         <a href="#" onclick="toggleManualInput()" style="font-size:12px; color:var(--primary);">Non in lista?</a>
                     </div>
-                    <button class="btn btn-primary" onclick="addExercise()">+ Aggiungi Esercizio</button>
+                    <button class="btn btn-primary btn-full" onclick="addExercise()">+ Aggiungi Esercizio</button>
                 </div>
 
-                <button id="saveBtn" class="btn btn-success" style="margin-top: 20px; display: none;" onclick="saveWorkout()">💾 Salva Allenamento</button>
+                <button id="saveBtn" class="btn btn-success btn-full" style="margin-top: 20px; display: none;" onclick="saveWorkout()">
+                    💾 Salva Allenamento
+                </button>
             </div>
         </div>
 
         <div id="history" class="content">
-            <div class="header"><h1>Storico</h1></div>
+            <div class="header">
+                <h1>Storico</h1>
+                <p>Allenamenti passati</p>
+            </div>
             <div style="padding: 20px;">
-                <div id="historyList">Caricamento...</div>
+                <div id="historyList"><div class="loading">Caricamento...</div></div>
             </div>
         </div>
 
         <div id="stats" class="content">
-            <div class="header"><h1>Progressi</h1></div>
+            <div class="header">
+                <h1>Statistiche</h1>
+                <p>Progressi</p>
+            </div>
             <div style="padding: 20px;">
-                <select id="chartExerciseSelector" class="form-input" onchange="updateChart()" style="margin-bottom: 15px;"></select>
+                <label class="form-label">Grafico (Max/MAV)</label>
+                <select id="chartExerciseSelector" class="form-input" onchange="updateChart()" disabled style="margin-bottom: 15px;">
+                    <option>Caricamento...</option>
+                </select>
                 <div class="card"><canvas id="progressChart"></canvas></div>
                 <div class="card">
-                    <h3>🏆 PR MAV (Record)</h3>
-                    <div id="personalRecords" style="margin-top:10px;"></div>
+                    <h3 style="margin-bottom: 12px;">🏆 Record (MAV)</h3>
+                    <div id="personalRecords"></div>
                 </div>
             </div>
         </div>
 
         <div class="tab-bar">
-            <button class="tab-btn active" onclick="switchTab('dashboard', this)"><span>🏠 Home</span></button>
-            <button class="tab-btn" onclick="switchTab('workout', this)"><span>💪 Workout</span></button>
-            <button class="tab-btn" onclick="switchTab('history', this)"><span>📅 Storico</span></button>
-            <button class="tab-btn" onclick="switchTab('stats', this)"><span>📈 Stats</span></button>
+            <button class="tab-btn active" onclick="switchTab('dashboard', this)">
+                <svg class="tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg><span>Home</span>
+            </button>
+            <button class="tab-btn" onclick="switchTab('workout', this)">
+                <svg class="tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg><span>Workout</span>
+            </button>
+            <button class="tab-btn" onclick="switchTab('history', this)">
+                <svg class="tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg><span>Storico</span>
+            </button>
+            <button class="tab-btn" onclick="switchTab('stats', this)">
+                <svg class="tab-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="20" x2="12" y2="10"/><line x1="18" y1="20" x2="18" y2="4"/><line x1="6" y1="20" x2="6" y2="16"/></svg><span>Stats</span>
+            </button>
         </div>
     </div>
 
-    <div id="plateModal" class="modal-overlay" onclick="if(event.target===this) closePlateCalc()">
-        <div class="modal-content">
-            <h3 style="text-align:center;">💿 Calcolatore Dischi</h3>
-            <div style="text-align:center; margin-top:10px; font-size:14px; color:#666;">
-                Per lato (Bilanciere 20kg)
-            </div>
-            <div id="plateVisual" class="plate-stack"></div>
-            <div id="plateText" style="text-align:center; font-weight:bold; font-size:18px; margin-bottom:15px;"></div>
-            <button class="btn btn-primary" onclick="closePlateCalc()">Chiudi</button>
-        </div>
+    <div id="restTimer" class="timer-float">
+        <span style="font-family:monospace; font-size:16px; font-weight:bold;" id="timerDisplay">00:00</span>
+        <button onclick="stopTimer()" style="background:none; border:none; color:#ef4444; font-size:16px; cursor:pointer;">⬛</button>
     </div>
 
-    <div id="restTimer" style="position:fixed; bottom:70px; right:20px; background:#1a1a1a; color:white; padding:10px 15px; border-radius:30px; display:none; align-items:center; gap:10px; z-index:900;">
-        <span id="timerDisplay" style="font-family:monospace; font-weight:bold;">00:00</span>
-        <button onclick="stopTimer()" style="background:none; border:none; color:#ef4444;">⬛</button>
-    </div>
-
-    <div id="settingsModal" class="modal-overlay" onclick="if(event.target===this) closeSettings()">
-        <div class="modal-content">
-            <h3>Impostazioni</h3>
-            <p id="settingsEmail" style="margin:10px 0; color:#666;">-</p>
-            <button class="btn btn-secondary" style="margin-bottom:10px;" onclick="resetConfiguration()">🔄 Reset Config</button>
-            <button class="btn btn-danger" onclick="logout()">🚪 Logout</button>
+    <div id="settingsModal" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 1000;">
+        <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; border-radius: 12px; padding: 20px; width: 90%; max-width: 400px;">
+            <h3 style="margin-bottom: 16px;">⚙️ Impostazioni</h3>
+            <div style="margin-bottom: 16px;">Account: <span id="settingsEmail">-</span></div>
+            <button class="btn btn-secondary btn-full" style="margin-bottom: 8px;" onclick="resetConfiguration()">🔄 Reset Config</button>
+            <button class="btn btn-danger btn-full" style="margin-bottom: 8px;" onclick="logout()">🚪 Esci</button>
+            <button class="btn btn-primary btn-full" onclick="closeSettings()">Chiudi</button>
         </div>
     </div>
 
     <div id="toast" class="toast"></div>
 
     <script>
-        // --- GLOBAL STATE ---
+        // --- STATO GLOBALE ---
         let supabaseClient = null;
         let currentUser = null;
         let workouts = [];
+        
+        // Stato Workout (Creazione o Modifica)
         let currentExercises = [];
-        let editingWorkoutId = null;
+        let editingWorkoutId = null; // Se popolato, siamo in modalità modifica
+        
+        // Timer e Chart
         let timerInterval;
         let timerSeconds = 0;
         let myChart = null;
-
+        
         // --- INIT ---
-        document.addEventListener('DOMContentLoaded', () => {
-            const url = localStorage.getItem('supabase_url');
-            const key = localStorage.getItem('supabase_key');
-            if(url && key) initializeSupabase(url, key);
-            else document.getElementById('configScreen').style.display='flex';
+        document.addEventListener('DOMContentLoaded', function() {
+            const savedUrl = localStorage.getItem('supabase_url');
+            const savedKey = localStorage.getItem('supabase_key');
+            
+            if (savedUrl && savedKey) {
+                initializeSupabase(savedUrl, savedKey);
+            } else {
+                document.getElementById('configScreen').style.display = 'flex';
+            }
             document.getElementById('workoutDate').value = new Date().toISOString().split('T')[0];
         });
-
-        // --- SUPABASE SETUP ---
+        
+        // --- SUPABASE & AUTH ---
         function saveConfiguration() {
             const url = document.getElementById('configUrl').value.trim();
             const key = document.getElementById('configKey').value.trim();
-            if(!url || !key) return showToast('Dati mancanti');
+            if (!url || !key) return showToast('Dati mancanti');
             localStorage.setItem('supabase_url', url);
             localStorage.setItem('supabase_key', key);
             initializeSupabase(url, key);
         }
-
+        
         async function initializeSupabase(url, key) {
             try {
                 supabaseClient = window.supabase.createClient(url, key);
                 const { data: { session } } = await supabaseClient.auth.getSession();
-                if(session) {
+                if (session) {
                     currentUser = session.user;
                     showApp();
                     await loadData();
-                } else showLoginScreen();
-
-                supabaseClient.auth.onAuthStateChange((evt, session) => {
-                    if(evt === 'SIGNED_IN') { currentUser = session.user; showApp(); loadData(); }
-                    if(evt === 'SIGNED_OUT') { currentUser = null; showLoginScreen(); }
+                } else {
+                    showLoginScreen();
+                }
+                supabaseClient.auth.onAuthStateChange((event, session) => {
+                    if (event === 'SIGNED_IN') {
+                        currentUser = session.user;
+                        showApp();
+                        loadData();
+                    } else if (event === 'SIGNED_OUT') {
+                        currentUser = null;
+                        showLoginScreen();
+                    }
                 });
-            } catch(e) { showToast('Errore connessione'); }
+            } catch (e) {
+                console.error(e);
+                showToast('Errore connessione');
+            }
         }
 
         async function login() {
-            const { error } = await supabaseClient.auth.signInWithPassword({
-                email: document.getElementById('loginEmail').value,
-                password: document.getElementById('loginPassword').value
-            });
-            if(error) alert(error.message);
+            const email = document.getElementById('loginEmail').value;
+            const pass = document.getElementById('loginPassword').value;
+            const { error } = await supabaseClient.auth.signInWithPassword({ email, password: pass });
+            if (error) showError('loginError', error.message);
         }
-
+        
         async function register() {
-            const { error } = await supabaseClient.auth.signUp({
-                email: document.getElementById('registerEmail').value,
-                password: document.getElementById('registerPassword').value
-            });
-            if(error) alert(error.message); else { alert('Conferma email!'); showLogin(); }
+            const email = document.getElementById('registerEmail').value;
+            const pass = document.getElementById('registerPassword').value;
+            const { error } = await supabaseClient.auth.signUp({ email, password: pass });
+            if (error) showError('registerError', error.message);
+            else { showToast('Email conferma inviata'); showLogin(); }
         }
-
-        async function logout() { await supabaseClient.auth.signOut(); }
-
-        // --- DATA LOAD ---
+        
+        async function logout() {
+            if(confirm('Vuoi uscire?')) await supabaseClient.auth.signOut();
+        }
+        
+        // --- CORE DATA LOADING ---
         async function loadData() {
             try {
                 const { data, error } = await supabaseClient
@@ -370,154 +469,120 @@
                     .eq('user_id', currentUser.id)
                     .order('date', { ascending: false });
                 
-                if(error) throw error;
+                if (error) throw error;
                 workouts = data || [];
                 updateDashboard();
                 loadExerciseList();
-                updateHistory();
-            } catch(e) { console.error(e); showToast('Errore dati'); }
-        }
-
-        async function loadExerciseList() {
-            const sel = document.getElementById('exerciseName');
-            sel.innerHTML = '<option value="">-- Seleziona --</option>';
-            const { data } = await supabaseClient.from('exercises').select('*').order('name');
-            if(data) data.forEach(ex => {
-                const opt = document.createElement('option');
-                opt.value = ex.name; opt.textContent = ex.name;
-                sel.appendChild(opt);
-            });
-        }
-
-        // --- WORKOUT LOGIC ---
-        function toggleManualInput() {
-            const i = document.getElementById('manualExercise');
-            const s = document.getElementById('exerciseName');
-            if(i.style.display==='none') { i.style.display='block'; s.style.display='none'; i.focus(); }
-            else { i.style.display='none'; s.style.display='block'; i.value=''; }
-        }
-
-        async function addExercise() {
-            const s = document.getElementById('exerciseName');
-            const i = document.getElementById('manualExercise');
-            const name = (i.style.display!=='none' && i.value) ? i.value : s.value;
-            if(!name) return showToast('Inserisci nome');
-
-            // Controlla se esiste uno storico per questo esercizio (Copia Ultimo)
-            const lastSession = await getLastSessionForExercise(name);
-
-            const newEx = { 
-                id: Date.now(), 
-                name: name, 
-                sets: [],
-                lastSessionData: lastSession // Salviamo i dati per usarli se l'utente clicca copia
-            };
-
-            currentExercises.push(newEx);
-            
-            i.value=''; s.value=''; i.style.display='none'; s.style.display='block';
-            updateExercisesList();
-        }
-
-        // Recupera l'ultimo allenamento di questo esercizio
-        async function getLastSessionForExercise(exName) {
-            // Cerchiamo l'esercizio ID
-            const { data: exData } = await supabaseClient.from('exercises').select('id').eq('name', exName).single();
-            if(!exData) return null;
-
-            // Cerchiamo l'ultima entry in workout_exercises
-            // Nota: RLS filtra già per utente se la policy è su workout_exercises -> workouts
-            const { data: weData } = await supabaseClient
-                .from('workout_exercises')
-                .select(`
-                    id, 
-                    sets:workout_sets(weight, reps, type, rpe)
-                `)
-                .eq('exercise_id', exData.id)
-                .order('id', { ascending: false }) // Assumiamo ID incrementale = cronologico, o bisognerebbe fare join su workouts
-                .limit(1)
-                .single();
-
-            return weData ? weData.sets : null;
-        }
-
-        function copyLastSession(exId) {
-            const ex = currentExercises.find(e => e.id === exId);
-            if(ex && ex.lastSessionData) {
-                // Clona i set
-                ex.sets = ex.lastSessionData.map(s => ({
-                    weight: s.weight,
-                    reps: s.reps,
-                    type: s.type,
-                    rpe: s.rpe || ''
-                }));
-                updateExercisesList();
-                showToast('Caricati set precedenti');
+                initChartSelector();
+                updateHistory(); // Aggiorna lista storico
+            } catch (e) {
+                console.error(e);
+                showToast('Errore caricamento dati');
             }
         }
 
+        async function loadExerciseList() {
+            const select = document.getElementById('exerciseName');
+            select.innerHTML = '<option value="">-- Seleziona Esercizio --</option>';
+            try {
+                const { data } = await supabaseClient.from('exercises').select('*').order('name');
+                if (data) data.forEach(ex => {
+                    const opt = document.createElement('option');
+                    opt.value = ex.name;
+                    opt.textContent = ex.name;
+                    select.appendChild(opt);
+                });
+            } catch (e) {}
+        }
+
+        // --- GESTIONE WORKOUT (ADD / EDIT) ---
+        function toggleManualInput() {
+            const input = document.getElementById('manualExercise');
+            const select = document.getElementById('exerciseName');
+            if (input.style.display === 'none') {
+                input.style.display = 'block'; select.style.display = 'none'; input.focus();
+            } else {
+                input.style.display = 'none'; select.style.display = 'block'; input.value = '';
+            }
+        }
+
+        function addExercise() {
+            const select = document.getElementById('exerciseName');
+            const input = document.getElementById('manualExercise');
+            const name = (input.style.display !== 'none' && input.value) ? input.value : select.value;
+            
+            if (!name) return showToast('Inserisci nome esercizio');
+            
+            currentExercises.push({ id: Date.now(), name: name, sets: [] });
+            
+            input.value = ''; select.value = '';
+            input.style.display = 'none'; select.style.display = 'block';
+            
+            updateExercisesList();
+            document.getElementById('saveBtn').style.display = 'block';
+        }
+
         function updateExercisesList() {
-            const list = document.getElementById('exercisesList');
-            document.getElementById('saveBtn').style.display = currentExercises.length ? 'block' : 'none';
+            const container = document.getElementById('exercisesList');
+            
+            if (currentExercises.length === 0) {
+                container.innerHTML = '<div style="text-align:center; color:#999; font-style:italic;">Nessun esercizio aggiunto</div>';
+                document.getElementById('saveBtn').style.display = 'none';
+                return;
+            }
 
-            list.innerHTML = currentExercises.map((ex, idx) => {
-                // Bottone "Copia Ultimo" se disponibile
-                const copyBtn = (ex.lastSessionData && ex.sets.length === 0) 
-                    ? `<button class="btn btn-warning btn-sm" onclick="copyLastSession(${ex.id})" style="width:100%; margin-bottom:8px;">📋 Copia Ultimo Allenamento</button>` 
-                    : '';
+            document.getElementById('saveBtn').style.display = 'block';
 
+            container.innerHTML = currentExercises.map((ex, exIdx) => {
+                const totalLoad = ex.sets.reduce((sum, s) => sum + (s.weight * s.reps), 0);
                 return `
-                <div class="exercise-block">
-                    <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
-                        <strong>${ex.name}</strong>
-                        <button onclick="removeExercise(${idx})" style="border:none; background:none; color:red;">🗑️</button>
-                    </div>
-                    
-                    ${copyBtn}
-
-                    <div id="sets-${ex.id}">
-                        ${ex.sets.map((s, sIdx) => `
-                            <div class="set-row">
-                                <div class="set-info">
-                                    <span style="font-weight:bold; background:#eee; padding:2px 6px; border-radius:4px;">${s.type.charAt(0)}</span>
-                                    <span>${s.weight}kg x ${s.reps}</span>
-                                    ${s.rpe ? `<span class="rpe-tag">@${s.rpe}</span>` : ''}
-                                </div>
-                                <button onclick="removeSet(${ex.id}, ${sIdx})" style="border:none; background:none; color:red; font-weight:bold;">✕</button>
+                    <div class="exercise-block">
+                        <div style="display:flex; justify-content:space-between; margin-bottom:12px; align-items:center;">
+                            <strong>${ex.name}</strong>
+                            <div style="display:flex; gap:10px; align-items:center;">
+                                <span style="font-size:12px; color:var(--primary);">${totalLoad} kg</span>
+                                <button onclick="removeExercise(${exIdx})" style="background:none; border:none; color:#ef4444; font-weight:bold; cursor:pointer;">🗑️</button>
                             </div>
-                        `).join('')}
-                    </div>
-
-                    <div class="set-input-grid">
-                        <div style="position:relative;">
-                            <input type="number" id="w-${ex.id}" placeholder="Kg" class="form-input" style="padding-right:30px;">
-                            <span onclick="openPlateCalc('w-${ex.id}')" style="position:absolute; right:5px; top:8px; cursor:pointer;">💿</span>
                         </div>
-                        <input type="number" id="r-${ex.id}" placeholder="Reps" class="form-input" style="padding:10px 4px;">
                         
-                        <select id="rpe-${ex.id}" class="form-input" style="padding:10px 2px; font-size:11px;">
-                            <option value="">RPE</option>
-                            <option value="6">@6</option><option value="6.5">@6.5</option>
-                            <option value="7">@7</option><option value="7.5">@7.5</option>
-                            <option value="8">@8</option><option value="8.5">@8.5</option>
-                            <option value="9">@9</option><option value="9.5">@9.5</option>
-                            <option value="10">@10</option>
-                        </select>
-
-                        <select id="t-${ex.id}" class="form-input" style="padding:10px 2px;">
-                            <option value="WARMUP">W</option>
-                            <option value="RAMP">R</option>
-                            <option value="MAV" selected>M</option>
-                            <option value="BACKOFF">B</option>
-                        </select>
-                        <button class="btn btn-primary" style="padding:10px 0;" onclick="addSet(${ex.id})">+</button>
+                        <button class="btn btn-primary btn-full" style="margin-bottom:8px; font-size:12px; padding:6px;" onclick="addMAVSequence(${ex.id})">
+                            ⚡ Sequenza MAV Auto
+                        </button>
+                        
+                        <div>
+                            ${ex.sets.map((set, setIdx) => `
+                                <div class="set-row">
+                                    <div style="display:flex; align-items:center;">
+                                        <span class="set-type ${set.type.toLowerCase()}">${set.type.substr(0,1)}</span>
+                                        <strong>${set.weight}kg × ${set.reps}</strong>
+                                    </div>
+                                    <button onclick="removeSet(${ex.id}, ${setIdx})" style="border:none; background:none; color:#ef4444; font-weight:bold; padding:4px;">✕</button>
+                                </div>
+                            `).join('')}
+                        </div>
+                        
+                        <div style="display: flex; gap: 6px; margin-top: 8px;">
+                            <input type="number" id="w-${ex.id}" placeholder="Kg" class="form-input" style="flex:1;">
+                            <input type="number" id="r-${ex.id}" placeholder="Reps" class="form-input" style="width:50px;">
+                            <select id="t-${ex.id}" class="form-input" style="width:60px; padding: 4px;">
+                                <option value="WARMUP">W</option>
+                                <option value="RAMP">R</option>
+                                <option value="MAV" selected>M</option>
+                                <option value="BACKOFF">B</option>
+                            </select>
+                            <button class="btn btn-primary" onclick="addSet(${ex.id})">+</button>
+                            <button class="btn btn-secondary" onclick="startTimer()">⏱️</button>
+                        </div>
                     </div>
-                    
-                    <div style="text-align:right; margin-top:8px;">
-                        <button class="btn btn-secondary btn-sm" onclick="startTimer()">⏱️ Timer</button>
-                    </div>
-                </div>`;
+                `;
             }).join('');
+        }
+
+        function removeExercise(index) {
+            if(confirm('Rimuovere esercizio?')) {
+                currentExercises.splice(index, 1);
+                updateExercisesList();
+            }
         }
 
         function addSet(exId) {
@@ -525,150 +590,224 @@
             const w = document.getElementById(`w-${exId}`).value;
             const r = document.getElementById(`r-${exId}`).value;
             const t = document.getElementById(`t-${exId}`).value;
-            const rpe = document.getElementById(`rpe-${exId}`).value;
-
-            if(w && r) {
-                ex.sets.push({ weight: parseFloat(w), reps: parseInt(r), type: t, rpe: rpe });
+            if (w && r) {
+                ex.sets.push({ weight: parseFloat(w), reps: parseInt(r), type: t });
                 updateExercisesList();
             }
         }
 
         function removeSet(exId, idx) {
             const ex = currentExercises.find(e => e.id === exId);
-            if(ex) { ex.sets.splice(idx, 1); updateExercisesList(); }
-        }
-        function removeExercise(idx) {
-            if(confirm('Rimuovere?')) { currentExercises.splice(idx, 1); updateExercisesList(); }
-        }
-
-        // --- PLATE CALCULATOR ---
-        function openPlateCalc(inputId) {
-            const val = document.getElementById(inputId).value;
-            if(!val) return showToast('Inserisci prima il peso');
-            const weight = parseFloat(val);
-            if(weight <= 20) return showToast('Peso troppo basso (Sbarra = 20kg)');
-
-            const oneSide = (weight - 20) / 2;
-            let remainder = oneSide;
-            const plates = [25, 20, 15, 10, 5, 2.5, 1.25];
-            const needed = [];
-
-            plates.forEach(p => {
-                while(remainder >= p) {
-                    needed.push(p);
-                    remainder -= p;
-                }
-            });
-
-            // Visual Rendering
-            const visual = document.getElementById('plateVisual');
-            visual.innerHTML = '<div class="bar-end"></div>';
-            needed.forEach(p => {
-                const cls = 'p-' + p.toString().replace('.','-');
-                visual.innerHTML += `<div class="plate ${cls}">${p}</div>`;
-            });
-
-            document.getElementById('plateText').innerText = `Carica ${oneSide}kg per lato`;
-            document.getElementById('plateModal').style.display = 'flex';
-        }
-        function closePlateCalc() { document.getElementById('plateModal').style.display = 'none'; }
-
-        // --- SAVE / EDIT ---
-        async function saveWorkout() {
-            if(!currentExercises.length) return;
-            showToast('Salvataggio...');
-            
-            try {
-                let wId = editingWorkoutId;
-                const note = document.getElementById('workoutNotes').value;
-                const date = document.getElementById('workoutDate').value;
-
-                if(wId) {
-                    await supabaseClient.from('workouts').update({date, notes:note}).eq('id', wId);
-                    await supabaseClient.from('workout_exercises').delete().eq('workout_id', wId);
-                } else {
-                    const { data } = await supabaseClient.from('workouts').insert({user_id: currentUser.id, date, notes:note}).select().single();
-                    wId = data.id;
-                }
-
-                for(const ex of currentExercises) {
-                    let exDbId;
-                    const { data: exist } = await supabaseClient.from('exercises').select('id').eq('name', ex.name).single();
-                    if(exist) exDbId = exist.id;
-                    else {
-                        const { data: neu } = await supabaseClient.from('exercises').insert({name: ex.name}).select().single();
-                        exDbId = neu.id;
-                    }
-
-                    const { data: we } = await supabaseClient.from('workout_exercises').insert({workout_id: wId, exercise_id: exDbId}).select().single();
-                    
-                    const setsPayload = ex.sets.map(s => ({
-                        workout_exercise_id: we.id,
-                        weight: s.weight, reps: s.reps, type: s.type, rpe: s.rpe || null
-                    }));
-                    if(setsPayload.length) await supabaseClient.from('workout_sets').insert(setsPayload);
-                }
-                
-                showToast('Salvato!');
-                cancelEdit();
-                await loadData();
-                switchTab('dashboard', document.querySelectorAll('.tab-btn')[0]);
-
-            } catch(e) { console.error(e); showToast('Errore salvataggio'); }
+            if(ex) {
+                ex.sets.splice(idx, 1);
+                updateExercisesList();
+            }
         }
 
-        function editWorkout(id) {
-            const w = workouts.find(x => x.id === id);
-            if(!w) return;
-            editingWorkoutId = id;
-            document.getElementById('workoutDate').value = w.date;
-            document.getElementById('workoutNotes').value = w.notes || '';
-            document.getElementById('editBanner').style.display = 'block';
-            
-            currentExercises = w.workout_exercises.map(we => ({
-                id: Math.random(),
-                name: we.exercise.name,
-                sets: we.sets.map(s => ({...s})),
-                lastSessionData: null
-            }));
-            
+        function addMAVSequence(exId) {
+            const target = parseFloat(prompt('Target MAV (kg)?', '100'));
+            if (!target) return;
+            const ex = currentExercises.find(e => e.id === exId);
+            ex.sets = [
+                { weight: Math.round(target*0.58), reps:4, type:'WARMUP' },
+                { weight: Math.round(target*0.67), reps:2, type:'WARMUP' },
+                { weight: Math.round(target*0.75), reps:1, type:'RAMP' },
+                { weight: Math.round(target*0.83), reps:1, type:'RAMP' },
+                { weight: Math.round(target*0.92), reps:1, type:'RAMP' },
+                { weight: target, reps:1, type:'MAV' },
+                { weight: Math.round(target*0.92), reps:2, type:'BACKOFF' }
+            ];
             updateExercisesList();
+        }
+
+        // --- LOGICA MODIFICA & SALVATAGGIO ---
+
+        // Attiva la modalità modifica
+        function editWorkout(id) {
+            const workout = workouts.find(w => w.id === id);
+            if (!workout) return;
+
+            editingWorkoutId = id;
+
+            // Popola UI
+            document.getElementById('workoutDate').value = workout.date;
+            document.getElementById('workoutNotes').value = workout.notes || '';
+            
+            // Popola esercizi mappando la struttura DB a quella Frontend
+            currentExercises = workout.workout_exercises.map(we => ({
+                id: Date.now() + Math.random(), // ID temporaneo frontend
+                name: we.exercise.name,
+                sets: we.sets.map(s => ({
+                    weight: s.weight,
+                    reps: s.reps,
+                    type: s.type
+                })).sort((a,b) => a.id - b.id) // Non cruciale l'ordine qui, ma utile
+            }));
+
+            // Aggiorna UI
+            document.getElementById('workoutHeader').querySelector('h1').textContent = "Modifica Workout";
+            document.getElementById('editModeBanner').style.display = 'block';
+            updateExercisesList();
+
+            // Cambia Tab
             switchTab('workout', document.querySelectorAll('.tab-btn')[1]);
+            showToast('Modalità modifica attivata');
         }
 
         function cancelEdit() {
             editingWorkoutId = null;
             currentExercises = [];
-            document.getElementById('editBanner').style.display = 'none';
             document.getElementById('workoutDate').value = new Date().toISOString().split('T')[0];
             document.getElementById('workoutNotes').value = '';
+            document.getElementById('workoutHeader').querySelector('h1').textContent = "Nuovo Workout";
+            document.getElementById('editModeBanner').style.display = 'none';
             updateExercisesList();
+            showToast('Modifica annullata');
         }
 
-        // --- STATS & 1RM ---
+        async function saveWorkout() {
+            if (currentExercises.length === 0) return showToast('Nessun esercizio');
+            showToast('Salvataggio...');
+
+            try {
+                let workoutId = editingWorkoutId;
+
+                if (editingWorkoutId) {
+                    // UPDATE: Aggiorna info base e rimuovi vecchi esercizi (per ricrearli puliti)
+                    const { error: uErr } = await supabaseClient
+                        .from('workouts')
+                        .update({
+                            date: document.getElementById('workoutDate').value,
+                            notes: document.getElementById('workoutNotes').value
+                        })
+                        .eq('id', editingWorkoutId);
+                    if(uErr) throw uErr;
+
+                    // Elimina vecchi esercizi (cascade eliminerà i set)
+                    await supabaseClient.from('workout_exercises').delete().eq('workout_id', editingWorkoutId);
+                } else {
+                    // INSERT: Crea nuovo workout
+                    const { data, error } = await supabaseClient
+                        .from('workouts')
+                        .insert({
+                            user_id: currentUser.id,
+                            date: document.getElementById('workoutDate').value,
+                            notes: document.getElementById('workoutNotes').value
+                        })
+                        .select().single();
+                    if(error) throw error;
+                    workoutId = data.id;
+                }
+
+                // INSERIMENTO ESERCIZI E SET (Comune per Insert e Update)
+                for (const ex of currentExercises) {
+                    // Trova o crea Esercizio
+                    let exId;
+                    const { data: existEx } = await supabaseClient.from('exercises').select('id').eq('name', ex.name).single();
+                    if (existEx) exId = existEx.id;
+                    else {
+                        const { data: newEx } = await supabaseClient.from('exercises').insert({name: ex.name}).select().single();
+                        exId = newEx.id;
+                    }
+
+                    // Collega al Workout
+                    const { data: we, error: weErr } = await supabaseClient
+                        .from('workout_exercises')
+                        .insert({ workout_id: workoutId, exercise_id: exId }).select().single();
+                    if(weErr) throw weErr;
+
+                    // Inserisci Set
+                    const setsToInsert = ex.sets.map(s => ({
+                        workout_exercise_id: we.id,
+                        weight: s.weight,
+                        reps: s.reps,
+                        type: s.type
+                    }));
+                    
+                    if(setsToInsert.length > 0) {
+                        const { error: sErr } = await supabaseClient.from('workout_sets').insert(setsToInsert);
+                        if(sErr) throw sErr;
+                    }
+                }
+
+                showToast('Allenamento Salvato!');
+                cancelEdit(); // Resetta form
+                await loadData();
+                switchTab('dashboard', document.querySelectorAll('.tab-btn')[0]);
+
+            } catch (e) {
+                console.error(e);
+                showToast('Errore salvataggio');
+            }
+        }
+
+        // --- STORICO & ELIMINAZIONE ---
+        function updateHistory() {
+            const list = document.getElementById('historyList');
+            if (!workouts.length) {
+                list.innerHTML = '<div class="loading">Nessun dato</div>'; return;
+            }
+            
+            list.innerHTML = workouts.map(w => {
+                const names = (w.workout_exercises || []).map(we => we.exercise?.name).join(', ');
+                const load = (w.workout_exercises || []).reduce((acc, we) => acc + (we.sets||[]).reduce((sAcc, s)=>sAcc+(s.weight*s.reps),0), 0);
+                
+                return `
+                <div class="card">
+                    <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+                        <div>
+                            <strong>${new Date(w.date).toLocaleDateString('it-IT', {weekday:'short', day:'numeric', month:'short'})}</strong>
+                            <div style="font-size:12px; color:#666; margin-top:4px;">${names}</div>
+                            ${w.notes ? `<div style="font-size:12px; font-style:italic; margin-top:2px;">"${w.notes}"</div>` : ''}
+                        </div>
+                        <div style="text-align:right;">
+                            <div style="font-weight:bold; color:var(--primary); margin-bottom:8px;">${Math.round(load)} kg</div>
+                            <div style="display:flex; gap:4px; justify-content:flex-end;">
+                                <button class="btn-warning" onclick="editWorkout(${w.id})" style="border:none; border-radius:4px; padding:6px 10px; font-size:14px; cursor:pointer;" title="Modifica">✏️</button>
+                                <button class="btn-danger" onclick="deleteWorkout(${w.id})" style="border:none; border-radius:4px; padding:6px 10px; font-size:14px; cursor:pointer;" title="Elimina">🗑️</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>`;
+            }).join('');
+        }
+
+        async function deleteWorkout(id) {
+            if(!confirm('Eliminare definitivamente questo allenamento?')) return;
+            const { error } = await supabaseClient.from('workouts').delete().eq('id', id);
+            if(error) showToast('Errore eliminazione');
+            else { showToast('Eliminato'); loadData(); }
+        }
+
+        // --- GRAFICI ---
+        function initChartSelector() {
+            const sel = document.getElementById('chartExerciseSelector');
+            const unique = new Set();
+            workouts.forEach(w => (w.workout_exercises || []).forEach(we => { if (we.exercise?.name) unique.add(we.exercise.name); }));
+            
+            if (unique.size === 0) { sel.innerHTML = '<option>Nessun dato</option>'; sel.disabled = true; return; }
+            
+            sel.disabled = false;
+            sel.innerHTML = '<option value="">Seleziona...</option>';
+            unique.forEach(name => {
+                const opt = document.createElement('option');
+                opt.value = name; opt.textContent = name; sel.appendChild(opt);
+            });
+        }
+
         function updateChart() {
-            const name = document.getElementById('chartExerciseSelector').value;
-            if(!name) return;
+            const exName = document.getElementById('chartExerciseSelector').value;
+            if(!exName) return;
             
             const ctx = document.getElementById('progressChart').getContext('2d');
-            const rawData = [];
+            const dataPoints = [];
+            const sortedWorkouts = [...workouts].sort((a,b) => new Date(a.date) - new Date(b.date));
             
-            [...workouts].sort((a,b)=>new Date(a.date)-new Date(b.date)).forEach(w => {
+            sortedWorkouts.forEach(w => {
                 w.workout_exercises.forEach(we => {
-                    if(we.exercise?.name === name && we.sets.length) {
-                        const maxW = Math.max(...we.sets.map(s=>s.weight));
-                        
-                        // Calcolo 1RM Stimato (Epley: w * (1 + r/30)) del set migliore
-                        const bestSet = we.sets.reduce((prev, curr) => 
-                            (curr.weight * (1+curr.reps/30)) > (prev.weight * (1+prev.reps/30)) ? curr : prev
-                        );
-                        const est1rm = bestSet.weight * (1 + bestSet.reps/30);
-
-                        rawData.push({ 
-                            date: new Date(w.date).toLocaleDateString('it-IT'), 
-                            max: maxW,
-                            e1rm: est1rm
-                        });
+                    if (we.exercise?.name === exName && we.sets.length > 0) {
+                        const maxW = Math.max(...we.sets.map(s => s.weight));
+                        dataPoints.push({ x: new Date(w.date).toLocaleDateString('it-IT'), y: maxW });
                     }
                 });
             });
@@ -677,121 +816,85 @@
             myChart = new Chart(ctx, {
                 type: 'line',
                 data: {
-                    labels: rawData.map(d => d.date),
-                    datasets: [
-                        {
-                            label: 'Kg Reali',
-                            data: rawData.map(d => d.max),
-                            borderColor: '#667eea', backgroundColor: 'rgba(102,126,234,0.1)',
-                            fill: true, tension: 0.3
-                        },
-                        {
-                            label: '1RM Stimato',
-                            data: rawData.map(d => d.e1rm),
-                            borderColor: '#f59e0b', borderDash: [5, 5],
-                            pointStyle: 'rectRot', tension: 0.1, fill: false
-                        }
-                    ]
+                    labels: dataPoints.map(d => d.x),
+                    datasets: [{
+                        label: `Max Kg ${exName}`, data: dataPoints.map(d => d.y),
+                        borderColor: '#667eea', backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                        tension: 0.3, fill: true
+                    }]
                 },
                 options: { responsive: true, scales: { y: { beginAtZero: false } } }
             });
         }
 
-        // --- HISTORY & UTILS ---
-        function updateHistory() {
-            const el = document.getElementById('historyList');
-            if(!workouts.length) { el.innerHTML='<div style="text-align:center;color:#999">Vuoto</div>'; return; }
-            el.innerHTML = workouts.map(w => {
-                const desc = w.workout_exercises.map(we => we.exercise?.name).join(', ');
-                return `
-                <div class="card">
-                    <div style="display:flex; justify-content:space-between;">
-                        <div>
-                            <strong>${new Date(w.date).toLocaleDateString('it-IT')}</strong>
-                            <div style="font-size:12px; color:#666;">${desc}</div>
-                        </div>
-                        <div>
-                            <button class="btn-warning btn-sm" onclick="editWorkout(${w.id})">✏️</button>
-                            <button class="btn-danger btn-sm" onclick="deleteWorkout(${w.id})">🗑️</button>
-                        </div>
-                    </div>
-                </div>`;
-            }).join('');
-        }
-
-        async function deleteWorkout(id) {
-            if(confirm('Eliminare?')) {
-                await supabaseClient.from('workouts').delete().eq('id', id);
-                loadData();
-            }
-        }
-
-        // --- NAVIGATION ---
-        function switchTab(id, btn) {
+        // --- NAVIGAZIONE & UTILS ---
+        function switchTab(tab, btn) {
             document.querySelectorAll('.content').forEach(c => c.classList.remove('active'));
-            document.getElementById(id).classList.add('active');
+            document.getElementById(tab).classList.add('active');
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
             if(btn) btn.classList.add('active');
-            
-            if(id === 'stats') {
-                // Populate selector logic
-                const sel = document.getElementById('chartExerciseSelector');
-                const unique = new Set();
-                workouts.forEach(w => w.workout_exercises.forEach(we => unique.add(we.exercise.name)));
-                sel.innerHTML = '<option value="">Seleziona Esercizio...</option>';
-                unique.forEach(u => {
-                    const opt = document.createElement('option');
-                    opt.value=u; opt.textContent=u; sel.appendChild(opt);
-                });
-                
-                // PRs
-                const recs = {};
-                workouts.forEach(w => w.workout_exercises.forEach(we => {
-                    we.sets.filter(s=>s.type==='MAV').forEach(s => {
-                        if(!recs[we.exercise.name] || s.weight > recs[we.exercise.name]) recs[we.exercise.name]=s.weight;
-                    });
-                }));
-                document.getElementById('personalRecords').innerHTML = Object.entries(recs)
-                    .sort((a,b)=>b[1]-a[1])
-                    .map(([k,v])=>`<div><b>${k}</b>: ${v}kg</div>`).join('');
-            }
+            if (tab === 'history') updateHistory();
+            if (tab === 'stats') { initChartSelector(); updatePersonalRecords(); }
         }
 
         function updateDashboard() {
-            document.getElementById('totalWorkouts').innerText = workouts.length;
-            let t = 0; workouts.forEach(w => w.workout_exercises.forEach(we => we.sets.forEach(s => t += s.weight*s.reps)));
-            document.getElementById('totalTonnage').innerText = (t/1000).toFixed(1) + 't';
-            const recent = workouts.slice(0,3);
-            document.getElementById('recentWorkouts').innerHTML = recent.map(w => 
-                `<div style="font-size:13px; border-bottom:1px solid #eee; padding:8px;">${new Date(w.date).toLocaleDateString('it-IT')} - ${w.workout_exercises.length} Ex</div>`
-            ).join('');
+            document.getElementById('totalWorkouts').textContent = workouts.length;
+            const t = workouts.reduce((acc, w) => acc + (w.workout_exercises||[]).reduce((wa, we) => wa + (we.sets||[]).reduce((sa, s)=>sa+(s.weight*s.reps),0),0), 0);
+            document.getElementById('totalTonnage').textContent = (t/1000).toFixed(1) + 't';
+            const recent = document.getElementById('recentWorkouts');
+            if(!workouts.length) recent.innerHTML = '<div class="loading">Nessun dato</div>';
+            else recent.innerHTML = workouts.slice(0,3).map(w => `
+                <div style="padding:12px; background:#f5f5f5; border-radius:8px; margin-bottom:8px;">
+                    <strong>${new Date(w.date).toLocaleDateString('it-IT')}</strong>
+                    <div style="font-size:12px; color:#666;">${(w.workout_exercises||[]).length} Esercizi</div>
+                </div>`).join('');
+        }
+        
+        function updatePersonalRecords() {
+            const recs = {};
+            workouts.forEach(w => w.workout_exercises.forEach(we => {
+                const mavs = we.sets.filter(s => s.type === 'MAV');
+                if (mavs.length) {
+                    const max = Math.max(...mavs.map(s => s.weight));
+                    if (!recs[we.exercise.name] || max > recs[we.exercise.name]) recs[we.exercise.name] = max;
+                }
+            }));
+            document.getElementById('personalRecords').innerHTML = Object.entries(recs).sort((a,b)=>b[1]-a[1])
+                .map(([k,v]) => `<div style="display:flex; justify-content:space-between; padding:8px; background:#f5f5f5; margin-bottom:4px; border-radius:6px;"><span>${k}</span><strong style="color:var(--primary);">${v} kg</strong></div>`).join('') || '<div class="loading">Nessun PR</div>';
         }
 
-        // --- SCREENS ---
-        function showApp() { document.getElementById('loginScreen').style.display='none'; document.getElementById('configScreen').style.display='none'; document.getElementById('appContainer').classList.add('active'); if(currentUser) document.getElementById('settingsEmail').textContent=currentUser.email; }
-        function showLoginScreen() { document.getElementById('appContainer').classList.remove('active'); document.getElementById('configScreen').style.display='none'; document.getElementById('loginScreen').style.display='flex'; }
-        function showRegister() { document.getElementById('loginForm').style.display='none'; document.getElementById('registerForm').style.display='block'; }
-        function showLogin() { document.getElementById('loginForm').style.display='block'; document.getElementById('registerForm').style.display='none'; }
-        
-        // --- TIMER ---
         function startTimer() {
-            document.getElementById('restTimer').style.display='flex';
-            timerSeconds=0; clearInterval(timerInterval);
+            document.getElementById('restTimer').style.display = 'flex'; timerSeconds = 0;
+            clearInterval(timerInterval);
             timerInterval = setInterval(() => {
                 timerSeconds++;
-                const m = Math.floor(timerSeconds/60).toString().padStart(2,'0');
-                const s = (timerSeconds%60).toString().padStart(2,'0');
-                document.getElementById('timerDisplay').innerText = `${m}:${s}`;
+                document.getElementById('timerDisplay').textContent = 
+                    `${Math.floor(timerSeconds/60).toString().padStart(2,'0')}:${(timerSeconds%60).toString().padStart(2,'0')}`;
             }, 1000);
         }
-        function stopTimer() { clearInterval(timerInterval); document.getElementById('restTimer').style.display='none'; }
+        function stopTimer() { clearInterval(timerInterval); document.getElementById('restTimer').style.display = 'none'; }
         
-        // --- SETTINGS ---
-        function showSettings() { document.getElementById('settingsModal').style.display='flex'; }
+        function showLoginScreen() {
+            document.getElementById('configScreen').style.display='none';
+            document.getElementById('loginScreen').style.display='flex';
+            document.getElementById('appContainer').classList.remove('active');
+        }
+        function showApp() {
+            document.getElementById('configScreen').style.display='none';
+            document.getElementById('loginScreen').style.display='none';
+            document.getElementById('appContainer').classList.add('active');
+            if(currentUser) {
+                document.getElementById('userEmail').textContent=currentUser.email;
+                document.getElementById('settingsEmail').textContent=currentUser.email;
+            }
+        }
+        function showRegister() { document.getElementById('loginForm').style.display='none'; document.getElementById('registerForm').style.display='block'; }
+        function showLogin() { document.getElementById('loginForm').style.display='block'; document.getElementById('registerForm').style.display='none'; }
+        function showSettings() { document.getElementById('settingsModal').style.display='block'; }
         function closeSettings() { document.getElementById('settingsModal').style.display='none'; }
-        function resetConfiguration() { if(confirm('Reset?')) { localStorage.clear(); location.reload(); } }
-        function showToast(m) { const t=document.getElementById('toast'); t.innerText=m; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),3000); }
-
+        function resetConfiguration() { if(confirm('Reset config?')) { localStorage.clear(); location.reload(); } }
+        function showToast(msg) { const t = document.getElementById('toast'); t.textContent = msg; t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 3000); }
+        function showError(id, msg) { const e = document.getElementById(id); e.textContent = msg; e.style.display = 'block'; }
     </script>
 </body>
 </html>
