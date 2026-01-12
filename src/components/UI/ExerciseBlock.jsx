@@ -54,28 +54,37 @@ export default function ExerciseBlock({
   }
 
   const handleAddMultipleSets = () => {
-    const numSets = parseInt(quickSets)
-    const r = parseInt(quickReps)
-    const w = parseFloat(quickWeight)
-    
-    if (!numSets || !r || !w || numSets <= 0 || r <= 0 || w <= 0) {
-      alert('Inserisci valori validi per serie multiple')
-      return
-    }
-    
-    if (numSets > 10) {
-      alert('Massimo 10 serie alla volta')
-      return
-    }
-    
-    for (let i = 0; i < numSets; i++) {
-      onSetAdd(exercise.id, { weight: w, reps: r, type: quickType })
-    }
-    
-    setQuickSets('')
-    setQuickReps('')
-    setQuickWeight('')
+  const numSets = parseInt(quickSets)
+  const r = parseInt(quickReps)
+  const w = parseFloat(quickWeight)
+  
+  console.log('Debug:', { numSets, r, w, quickSets, quickReps, quickWeight }) // DEBUG
+  
+  if (!numSets || !r || !w || numSets <= 0 || r <= 0 || w <= 0) {
+    alert(`Valori non validi!\nSerie: ${numSets}\nReps: ${r}\nKg: ${w}`)
+    return
   }
+  
+  if (numSets > 10) {
+    alert('Massimo 10 serie alla volta')
+    return
+  }
+  
+  // Aggiungi tutte le serie in un colpo solo
+  const newSets = []
+  for (let i = 0; i < numSets; i++) {
+    newSets.push({ weight: w, reps: r, type: quickType })
+  }
+  
+  // Aggiungi tutte insieme
+  newSets.forEach(set => onSetAdd(exercise.id, set))
+  
+  setQuickSets('')
+  setQuickReps('')
+  setQuickWeight('')
+  
+  alert(`${numSets} serie aggiunte!`) // Feedback
+}
 
   const handleMAVSequence = () => {
     const target = parseFloat(prompt('Target MAV (kg)?', '100'))
