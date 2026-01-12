@@ -1,0 +1,46 @@
+{
+  "name": "MAV Tracker - Workout Tracker",
+  "short_name": "MAV Tracker",
+  "description": "Track your MAV (Maximum Achievable Volume) training workouts",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#667eea",
+  "theme_color": "#667eea",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/screenshot1.png",
+      "sizes": "540x720",
+      "type": "image/png"
+    }
+  ],
+  "categories": ["health", "fitness", "sports"],
+  "shortcuts": [
+    {
+      "name": "New Workout",
+      "short_name": "Workout",
+      "description": "Start a new workout session",
+      "url": "/?tab=workout",
+      "icons": [
+        {
+          "src": "/icon-96.png",
+          "sizes": "96x96"
+        }
+      ]
+    }
+  ]
+}

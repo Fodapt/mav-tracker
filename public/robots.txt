@@ -1,0 +1,7 @@
+# MAV Tracker - robots.txt
+
+User-agent: *
+Allow: /
+
+# Sitemap (aggiorna con il tuo dominio quando deployed)
+# Sitemap: https://mav-tracker.vercel.app/sitemap.xml
